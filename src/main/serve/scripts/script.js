@@ -171,8 +171,8 @@ Problem page
         "wrong_answer": "Wrong Answer",
         "tle": "Time Limit Exceeded",
         "runtime_error": "Runtime Error",
-        "incomplete" : "times",
-        "reject" : "times"
+        "incomplete" : "Incomplete",
+        "reject" : "Reject"
     };
 
     function showResults(sub) {
