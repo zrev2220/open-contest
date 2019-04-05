@@ -36,6 +36,7 @@ def leaderboard(params, user):
     for user in subs:
         usersubs = subs[user]
         scor = score(usersubs, start, problemSummary)
+
         scores.append((
             User.get(user).username,
             scor[0],
@@ -54,6 +55,7 @@ def leaderboard(params, user):
     
     scoresDisplay = []
     for (name, solved, samples, points, attempts), rank in zip(scores, ranks):
+ 
         scoresDisplay.append(h.tr(
             h.td(rank, cls="center"),
             h.td(name),
@@ -101,7 +103,11 @@ def leaderboard(params, user):
                 *problemSummaryDisplay
             )
 
-        )
+        ),
+        h.br(), h.br(), h.br(),
+        div(cls="actions", contents=[
+            h.button("Correct Log", cls="button correct-log", onclick="window.location='/correctLog'")
+        ])
     )
 
 def score(submissions: list, contestStart, problemSummary) -> tuple:
