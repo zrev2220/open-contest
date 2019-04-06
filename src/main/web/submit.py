@@ -101,6 +101,23 @@ def runCode(sub):
     sub.outputs = outputs
     sub.answers = answers
     sub.errors = errors
+    if all(i == "ok" for i in results):
+        if sub.language == 'c':
+            sub.problem.c += 1
+        elif sub.language == 'cpp':
+            sub.problem.cpp += 1
+        elif sub.language == 'cs':
+            sub.problem.cs += 1
+        elif sub.language == 'java':
+            sub.problem.java += 1
+        elif sub.language == 'python2':
+            sub.problem.python2 += 1
+        elif sub.language == 'python3':
+            sub.problem.python3 += 1
+        elif sub.language == 'ruby':
+            sub.problem.ruby += 1
+        elif sub.language == 'vb':
+            sub.problem.vb += vb
 
     if sub.type == "submit":
         sub.save()

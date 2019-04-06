@@ -65,7 +65,7 @@ def detailedReport(params, user):
             attmpts.append(h.td(attmpt, cls="center"))
         scoresDisplay.append(h.tr(
             h.td(rank, cls="center"),
-            h.td(name),
+            h.td(name) if contest.end <= time.time() * 1000 else '',
             h.td(usrID, cls="center"),
             h.td(solved, cls="center"),
             h.td(points, cls="center"),
@@ -73,12 +73,15 @@ def detailedReport(params, user):
         ))
 
     problemSummaryDisplay = []
+    cnt = 1
     for problem in contest.problems:
         problemSummaryDisplay.append(h.tr(
+            h.td(cnt),
             h.td(problem.title),
             h.td(problemSummary[problem.id][0], cls="center"),
             h.td(problemSummary[problem.id][1], cls="center")
         ))
+        cnt += 1
 
     prblmHeader = []    
     cnt = 1
@@ -93,7 +96,7 @@ def detailedReport(params, user):
             h.thead(
                 h.tr(
                     h.th("Rank", cls="center"),
-                    h.th("Contestant"),
+                    h.th("Contestant") if contest.end <= time.time() * 1000 else '',
                     h.th("ContestantID", cls="center"),
                     h.th("Correct", cls="center"),
                     h.th("Penalty", cls="center"),
@@ -108,13 +111,35 @@ def detailedReport(params, user):
         h.table(
             h.thead(
                 h.tr(
-                    h.th("Problem", cls="center"),
+                    h.th("#"),
+                    h.th("Title"),
                     h.th("Attempts", cls="center"),
-                    h.th("Solved", cls="center"),
+                    h.th("Correct", cls="center"),
                 )
             ),
             h.tbody(
                 *problemSummaryDisplay
+            )
+
+        ),
+        h2("Problem Summary", cls="page-title"),
+        h.table(
+            h.thead(
+                h.tr(
+                    h.th("#"),
+                    h.th("Title"),
+                    h.th("c", cls="center"),
+                    h.th("cpp", cls="center"),
+                    h.th("cs", cls="center"),
+                    h.th("java", cls="center"),
+                    h.th("python2", cls="center"),
+                    h.th("python3", cls="center"),
+                    h.th("ruby", cls="center"),
+                    h.th("vb", cls="center")
+                )
+            ),
+            h.tbody(
+                h.td(contest.problems[0].c, cls="center")
             )
 
         )
@@ -125,10 +150,20 @@ def getDetails(submissions: list, contest):
     index = 0
     for i in contest.problems:
         count = 0
+        correct = False
+
         for j in submissions:
             if j.problem.id == i.id:
                 count+=1
-        details[index] = count
+                if all(i == "ok" for i in j.results) and not correct:
+                    correct = True
+                    s, ms = divmod(j.timestamp, 1000)
+
+        tm = time.strftime('%H:%M', time.gmtime(s)) if count and correct else '--'
+        tm = '' if count == 0 else tm
+        countTxt = '(' + str(count) + ') ' if count else ''
+        txt = countTxt + tm
+        details[index] = txt
         index += 1
     return details
 

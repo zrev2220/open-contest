@@ -24,6 +24,14 @@ class Datum:
 
 class Problem:
     saveCallbacks = []
+    c = 0
+    cpp = 0
+    cs = 0
+    java = 0
+    python2 = 0
+    python3 = 0
+    ruby = 0
+    vb = 0
     def __init__(self, id=None):
         if id != None:
             details = getKey(f"/problems/{id}/problem.json")
