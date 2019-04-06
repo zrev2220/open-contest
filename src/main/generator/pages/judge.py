@@ -119,7 +119,7 @@ class ProblemContent(UIElement):
 
 class SubmissionRow(UIElement):
     def __init__(self, sub):
-        self.html = h.tr(
+        self.tr = h.tr(
             h.td(sub.user.username),
             h.td(sub.problem.title),
             h.td(cls='time-format', contents=sub.timestamp),
@@ -128,9 +128,11 @@ class SubmissionRow(UIElement):
                 h.i("&nbsp;", cls=f"fa fa-{icons[sub.result]}"),
                 h.span(verdict_name[sub.result])
             ),
-            # h.td(h.span(sub.status if sub.status is not None else "None")), # TODO: Adding this column breaks the whole table for who knows why
+            h.td(sub.status if sub.status is not None else "None"),
+            h.td(str(None)),
             onclick=f"submissionPopup('{sub.id}')"
         )
+        self.html = self.tr
 
 class SubmissionTable(UIElement):
     def __init__(self, contest):
@@ -143,7 +145,8 @@ class SubmissionTable(UIElement):
                     h.th("Time"),
                     h.th("Language"),
                     h.th("Result"),
-                    h.th("Status")
+                    h.th("Status"),
+                    h.th("Checkout"),
                 )
             ),
             h.tbody(

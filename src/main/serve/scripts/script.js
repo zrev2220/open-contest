@@ -65,7 +65,7 @@ General page code
         }
         $(".result-tabs").tabs();
         // $(".tablesorter").tablesorter();
-        var props = {  
+        var props = {
             sort: true,  
             filters_row_index:1,  
             remember_grid_values: true,  
@@ -76,10 +76,12 @@ General page code
                 values: [],
                 sorts: []
             }
-        }  
-    if ($("#submissions").length) {
-        var tf = setFilterGrid("submissions",props); 
-    }
+        }
+        if ($("#submissions").length) {
+            var tf = new TableFilter("submissions", props);
+            tf.init();
+            // var tf = setFilterGrid("submissions", props);
+        }
     });
 /*--------------------------------------------------------------------------------------------------
 Problem page
