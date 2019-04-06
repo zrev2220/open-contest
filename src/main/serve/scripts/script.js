@@ -80,7 +80,8 @@ General page code
         if ($("#submissions").length) {
             var tf = new TableFilter("submissions", props);
             tf.init();
-            // var tf = setFilterGrid("submissions", props);
+            tf.setFilterValue(5, "Review");
+            tf.filter();
         }
     });
 /*--------------------------------------------------------------------------------------------------
@@ -164,13 +165,15 @@ Problem page
         "ok": "check",
         "wrong_answer": "times",
         "tle": "clock",
-        "runtime_error": "exclamation-triangle"
+        "runtime_error": "exclamation-triangle",
+        "pending": "sync",
     };
     var verdict_name = {
         "ok": "Accepted",
         "wrong_answer": "Wrong Answer",
         "tle": "Time Limit Exceeded",
-        "runtime_error": "Runtime Error"
+        "runtime_error": "Runtime Error",
+        "pending": "Pending",
     };
 
     function showResults(sub) {
@@ -671,7 +674,8 @@ Judging Page
 --------------------------------------------------------------------------------------------------*/
     function changeSubmissionResult(id) {
         var result = $(`.result-choice.${id}`).val();
-        $.post("/changeResult", {id: id, result: result}, result => {
+        var status = $(`.status-choice.${id}`).val();
+        $.post("/changeResult", {id: id, result: result, status: status}, result => {
             if (result == "ok") {
                 window.location.reload();
             } else {

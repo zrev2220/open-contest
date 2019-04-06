@@ -41,6 +41,15 @@ def resultOptions(result):
             ans.append(h.option(verdict_name[res], value=res))
     return ans
 
+def statusOptions(status):
+    ans = []
+    for stat in ["Review", "Judged"]:
+        if status == stat:
+            ans.append(h.option((stat), value=stat, selected="selected"))
+        else:
+            ans.append(h.option((stat), value=stat))
+    return ans
+
 class TestCaseTab(UIElement):
     def __init__(self, x, sub):
         num, result = x
@@ -54,6 +63,8 @@ class TestCaseTab(UIElement):
 class TestCaseData(UIElement):
     def __init__(self, x, sub):
         num, input, output, error, answer = x
+        if output is None:
+            output = ""
         self.html = div(id=f"tabs-{sub.id}-{num}", contents=[
             div(cls="row", contents=[
                 div(cls="col-12", contents=[
@@ -77,7 +88,7 @@ class SubmissionCard(UIElement):
     def __init__(self, submission: Submission):
         subTime = submission.timestamp
         probName = submission.problem.title
-        cls = "red" if submission.result != "ok" else ""
+        cls = "gray" if submission.status == "Review" else "red" if submission.result != "ok" else ""
         self.html = div(cls="modal-content", contents=[
             div(cls=f"modal-header {cls}", contents=[
                 h.h5(
@@ -93,10 +104,17 @@ class SubmissionCard(UIElement):
                 h.strong("Language: <span class='language-format'>{}</span>".format(submission.language)),
                 h.br(),
                 h.strong("Result: ",
-                    h.select(cls=f"result-choice {submission.id}", onchange=f"changeSubmissionResult('{submission.id}')", contents=[
+                    h.select(cls=f"result-choice {submission.id}", contents=[
                         *resultOptions(submission.result)
                     ])
                 ),
+                h.strong("&emsp;Status: ",
+                    h.select(cls=f"status-choice {submission.id}", contents=[
+                        *statusOptions(submission.status)
+                    ])
+                ),
+                h.span("&emsp;"),
+                h.button("Save", type="button", onclick=f"changeSubmissionResult('{submission.id}')", cls="btn btn-primary"),
                 h.br(),
                 h.br(),
                 h.button("Rejudge", type="button", onclick=f"rejudge('{submission.id}')", cls="btn btn-primary rejudge"),
@@ -128,8 +146,8 @@ class SubmissionRow(UIElement):
                 h.i("&nbsp;", cls=f"fa fa-{icons[sub.result]}"),
                 h.span(verdict_name[sub.result])
             ),
-            h.td(sub.status if sub.status is not None else "None"),
-            h.td(str(None)),
+            h.td(sub.status),
+            h.td(sub.checkout),
             onclick=f"submissionPopup('{sub.id}')"
         )
         self.html = self.tr

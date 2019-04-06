@@ -69,6 +69,12 @@ class Submission:
             "checkout":  self.checkout,
         }
 
+    def getContestantResult(self):
+        return self.result if self.status == "Judged" else "pending"
+
+    def getContestantIndividualResults(self):
+        return [res if res in ["ok", "runtime_error", "tle"] or self.status == "Judged" else "pending" for res in self.results]
+
     def save(self):
         with lock.gen_wlock():
             if self.id == None:
