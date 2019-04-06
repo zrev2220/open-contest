@@ -128,6 +128,7 @@ class SubmissionRow(UIElement):
                 h.i("&nbsp;", cls=f"fa fa-{icons[sub.result]}"),
                 h.span(verdict_name[sub.result])
             ),
+            # h.td(h.span(sub.status if sub.status is not None else "None")), # TODO: Adding this column breaks the whole table for who knows why
             onclick=f"submissionPopup('{sub.id}')"
         )
 
@@ -141,7 +142,8 @@ class SubmissionTable(UIElement):
                     h.th("Problem"),
                     h.th("Time"),
                     h.th("Language"),
-                    h.th("Result")
+                    h.th("Result"),
+                    h.th("Status")
                 )
             ),
             h.tbody(
@@ -159,8 +161,8 @@ def judge(params, user):
         )
     
     return Page(
-        h2("Judge Submissions", cls="page-title"),
-        div(id="judge-table", contents=[
+        h2("Judge Submissions", cls="page-title judge-width"),
+        div(id="judge-table", cls="judge-width", contents=[
             SubmissionTable(cont)
         ]),
         div(cls="modal", tabindex="-1", role="dialog", contents=[
