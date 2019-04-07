@@ -47,7 +47,6 @@ class Contest:
         with lock.gen_wlock():
             if self.id == None:
                 self.id = str(uuid4())
-                contests[self.id] = self
             setKey(f"/contests/{self.id}/contest.json", self.toJSONSimple())
         for callback in Contest.saveCallbacks:
             callback(self)

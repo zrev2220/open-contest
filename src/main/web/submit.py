@@ -1,7 +1,7 @@
 import os
 import logging
 from code.util import register
-from code.util.db import Submission, Problem
+from code.util.db import Submission, Problem, Contest
 import time
 import shutil
 import re
@@ -101,26 +101,28 @@ def runCode(sub):
     sub.outputs = outputs
     sub.answers = answers
     sub.errors = errors
-    if all(i == "ok" for i in results):
+    if all(i == "ok" for i in results): #sub.user.id not in sub.problem.contests[Contest.getCurrent()]["completed"]:
+        #sub.problem.contests[Contest.getCurrent()]["completed"].append(sub.user.id)
         if sub.language == 'c':
-            sub.problem.c += 1
+            sub.problem.contests[Contest.getCurrent()]["c"] += 1
         elif sub.language == 'cpp':
-            sub.problem.cpp += 1
+            sub.problem.contests[Contest.getCurrent()]["cpp"] += 1
         elif sub.language == 'cs':
-            sub.problem.cs += 1
+            sub.problem.contests[Contest.getCurrent()]["cs"] += 1
         elif sub.language == 'java':
-            sub.problem.java += 1
+            sub.problem.contests[Contest.getCurrent()]["java"] += 1
         elif sub.language == 'python2':
-            sub.problem.python2 += 1
+            sub.problem.contests[Contest.getCurrent().id]["python2"] += 1
         elif sub.language == 'python3':
-            sub.problem.python3 += 1
+            sub.problem.contests[Contest.getCurrent()]["python3"] += 1
         elif sub.language == 'ruby':
-            sub.problem.ruby += 1
+            sub.problem.contests[Contest.getCurrent()]["ruby"] += 1
         elif sub.language == 'vb':
-            sub.problem.vb += vb
+            sub.problem.contests[Contest.getCurrent()]["vb"] += vb
 
     if sub.type == "submit":
         sub.save()
+        sub.problem.save()
 
     shutil.rmtree(f"/tmp/{sub.id}", ignore_errors=True)
 
@@ -136,6 +138,24 @@ def submit(params, setHeader, user):
 def changeResult(params, setHeader, user):
     id = params["id"]
     sub = Submission.get(id)
+    if params["result"] != "ok" and sub.user.id in sub.problem.contests[Contest.getCurrent()]["completed"]:
+        sub.problem.contests[Contest.getCurrent()]["completed"].remove(sub.user.id)
+        if sub.language == 'c':
+            sub.problem.contests[Contest.getCurrent()]['c'] -= 1
+        elif sub.language == 'cpp':
+            sub.problem.contests[Contest.getCurrent()]['cpp'] -= 1
+        elif sub.language == 'cs':
+            sub.problem.contests[Contest.getCurrent()]['cs'] -= 1
+        elif sub.language == 'java':
+            sub.problem.contests[Contest.getCurrent()]['java'] -= 1
+        elif sub.language == 'python2':
+            sub.problem.contests[Contest.getCurrent()]['python2'] -= 1
+        elif sub.language == 'python3':
+            sub.problem.contests[Contest.getCurrent()]['python3'] -= 1
+        elif sub.language == 'ruby':
+            sub.problem.contests[Contest.getCurrent()]['ruby'] -= 1
+        elif sub.language == 'vb':
+            sub.problem.contests[Contest.getCurrent()]['vb'] -= vb
     if not sub:
         return "Error: incorrect id"
     sub.result = params["result"]

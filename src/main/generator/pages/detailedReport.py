@@ -73,6 +73,7 @@ def detailedReport(params, user):
         ))
 
     problemSummaryDisplay = []
+    languageSummaryDisplay = []
     cnt = 1
     for problem in contest.problems:
         problemSummaryDisplay.append(h.tr(
@@ -80,6 +81,18 @@ def detailedReport(params, user):
             h.td(problem.title),
             h.td(problemSummary[problem.id][0], cls="center"),
             h.td(problemSummary[problem.id][1], cls="center")
+        ))
+        languageSummaryDisplay.append(h.tr(
+            h.td(cnt),
+            h.td(problem.title),
+            h.td(problem.c, cls="center"),
+            h.td(problem.cpp, cls="center"),
+            h.td(problem.cs, cls="center"),
+            h.td(problem.java, cls="center"),
+            h.td(problem.python2, cls="center"),
+            h.td(problem.python3, cls="center"),
+            h.td(problem.ruby, cls="center"),
+            h.td(problem.vb, cls="center")
         ))
         cnt += 1
 
@@ -139,7 +152,7 @@ def detailedReport(params, user):
                 )
             ),
             h.tbody(
-                h.td(contest.problems[0].c, cls="center")
+                *languageSummaryDisplay
             )
 
         )

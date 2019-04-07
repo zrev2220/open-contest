@@ -2,6 +2,7 @@ from code.util.db import getKey, setKey, listSubKeys, deleteKey
 from uuid import uuid4
 from readerwriterlock import rwlock
 
+
 lock = rwlock.RWLockWrite()
 
 problems = {}
@@ -24,14 +25,6 @@ class Datum:
 
 class Problem:
     saveCallbacks = []
-    c = 0
-    cpp = 0
-    cs = 0
-    java = 0
-    python2 = 0
-    python3 = 0
-    ruby = 0
-    vb = 0
     def __init__(self, id=None):
         if id != None:
             details = getKey(f"/problems/{id}/problem.json")
@@ -46,6 +39,7 @@ class Problem:
             self.tests       = int(details["tests"])
             self.sampleData  = [Datum.get(id, i) for i in range(self.samples)]
             self.testData    = [Datum.get(id, i) for i in range(self.tests)]
+            self.contests    = details["contests"]
         else:
             self.id          = None
             self.title       = None
@@ -58,6 +52,7 @@ class Problem:
             self.tests       = 0
             self.sampleData  = []
             self.testData    = []
+            self.contests    = {}
 
     def get(id: str):
         with lock.gen_rlock():
@@ -76,6 +71,7 @@ class Problem:
             "constraints": self.constraints,
             "samples":     self.samples,
             "tests":       self.tests,
+            "contests":    self.contests
         }
 
     def save(self):

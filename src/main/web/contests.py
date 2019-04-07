@@ -16,7 +16,10 @@ def editContest(params, setHeader, user):
     contest.end      = int(params["end"])
     contest.scoreboardOff = int(params["scoreboardOff"])
     contest.problems = [Problem.get(id) for id in json.loads(params["problems"])]
-
+    for i in contest.problems:
+        print("HIHI")
+        i.contests[contest.id] = {"c" : 0, "cpp" : 0, "cs" : 0, "java" : 0, "python2" : 0, "python3" : 0, "ruby" : 0, "vb" : 0, "completed" : []}
+        print("BYE")
     contest.save()
 
     return contest.id

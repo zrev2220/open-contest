@@ -34,7 +34,7 @@ class ProblemCard(UIElement):
 def editContest(params, user):
     id = params[0] if params else None
     contest = Contest.get(id)
-    
+
     title = "New Contest"
     chooseProblem = ""
     existingProblems = []
@@ -43,7 +43,7 @@ def editContest(params, user):
     scoreboardOff = (time.time() + 2700) * 1000
     if contest:
         title = contest.name
-        start = contest.start
+        start = contest.startchooseProblemchooseProblem
         end = contest.end
         scoreboardOff = contest.scoreboardOff
         chooseProblem = div(cls="actions", contents=[
