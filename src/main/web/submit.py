@@ -1,7 +1,7 @@
 import os
 import logging
 from code.util import register
-from code.util.db import Submission, Problem
+from code.util.db import Submission, Problem, User
 import time
 import shutil
 import re
@@ -133,6 +133,20 @@ def rejudge(params, setHeader, user):
     runCode(submission)
     return submission.result
 
+def rejudgeAll(params, setHeader, user):
+    probId = params["probId"]
+    # curTime = params["curTime"]
+    curTime = time.time() * 1000
+    count = 0
+    for contestant in filter(lambda c: not c.isAdmin(), User.all()):
+        for sub in filter(lambda s: s.user.id == contestant.id and s.problem.id == probId and s.timestamp < curTime and s.result != "reject" and s.type != "test", Submission.all()):
+            if os.path.exists(f"/tmp/{id}"):
+                shutil.rmtree(f"/tmp/{id}")
+            runCode(sub)
+            count += 1
+    return {"name": Problem.get(probId).title, "count": count}
+
 register.post("/submit", "loggedin", submit)
 register.post("/changeResult", "admin", changeResult)
 register.post("/rejudge", "admin", rejudge)
+register.post("/rejudgeAll", "admin", rejudgeAll)

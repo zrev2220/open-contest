@@ -701,3 +701,13 @@ Judging Page
             alert(`New Result: ${verdict_name[data]}`);
         });
     }
+
+    function rejudgeAll(probId) {
+        var btn = $(`#rejudgeAll${probId}`);
+        btn.attr("disabled", true).addClass("button-gray");
+
+        $.post("/rejudgeAll", {probId: probId}, data => {
+            btn.attr("disabled", false).removeClass("button-gray");
+            alert(`Finished rejudging ${data["name"]}\nRejudged ${data["count"]} submissions`);
+        });
+    }

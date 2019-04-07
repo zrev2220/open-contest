@@ -69,11 +69,20 @@ def listProblems(params, user):
         contest = Contest.getCurrent()
         probCards = []
         for prob in contest.problems:
+            contents = [prob.description]
+            # if user.isAdmin():
+            #     contents.append(h.br())
+            #     contents.append(h.button("Rejudge All", type="button", onclick=f"rejudgeAll('{prob.id}')", cls="btn btn-primary"))
             probCards.append(Card(
                 prob.title,
-                prob.description,
+                contents,
                 f"/problems/{prob.id}"
             ))
+            if user.isAdmin():
+                probCards.append(h.span("&emsp;"))
+                probCards.append(h.button("Rejudge All", type="button", id=f"rejudgeAll{prob.id}", onclick=f"rejudgeAll('{prob.id}')", cls="btn btn-primary"))
+                probCards.append(h.br())
+                probCards.append(h.br())
         return Page(
             h2("Problems", cls="page-title"),
             *probCards
