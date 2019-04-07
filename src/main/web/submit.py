@@ -123,17 +123,22 @@ def submit(params, setHeader, user):
         response["results"] = submission.getContestantIndividualResults()
     return response
 
-def changeResult(params, setHeader, user): # TODO some changes here
+def changeResult(params, setHeader, user):
+    version = int(params["version"])
     id = params["id"]
     sub = Submission.get(id)
     if not sub:
         return "Error: incorrect id"
+    elif sub.version != version:
+        return "The submission has been changed by another judge since you loaded it. Please reload the sumbission to modify it."
     sub.result = params["result"]
     sub.status = params["status"]
+    sub.version += 1
+    sub.checkout = None
     sub.save()
     return "ok"
 
-def rejudge(params, setHeader, user): # TODO changes here too
+def rejudge(params, setHeader, user):
     id = params["id"]
     submission = Submission.get(id)
     if os.path.exists(f"/tmp/{id}"):

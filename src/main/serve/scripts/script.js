@@ -672,10 +672,10 @@ Messages Page
 /*--------------------------------------------------------------------------------------------------
 Judging Page
 --------------------------------------------------------------------------------------------------*/
-    function changeSubmissionResult(id) {
+    function changeSubmissionResult(id, version) {
         var result = $(`.result-choice.${id}`).val();
         var status = $(`.status-choice.${id}`).val();
-        $.post("/changeResult", {id: id, result: result, status: status}, result => {
+        $.post("/changeResult", {id: id, result: result, status: status, version: version}, result => {
             if (result == "ok") {
                 window.location.reload();
             } else {
@@ -684,12 +684,20 @@ Judging Page
         })
     }
 
-    function submissionPopup(id) {
-        $.post(`/judgeSubmission/${id}`, {}, data => {
-            $(".modal-dialog").html(data);
-            $(".result-tabs").tabs();
-            fixFormatting();
-            $(".modal").modal();
+    function submissionPopup(id, force) {
+        var url = `/judgeSubmission/${id}` + (force ? "/force" : "");
+        $.post(url, {}, data => {
+            if (data.startsWith("CONFLICT") && !force) {
+                var otherJudge = data.slice(data.indexOf(":")+1, data.length);
+                if (window.confirm(`${otherJudge} is already reviewing this submission. Do you want to override with your review?`))
+                    submissionPopup(id, true);
+            }
+            else {
+                $(".modal-dialog").html(data);
+                $(".result-tabs").tabs();
+                fixFormatting();
+                $(".modal").modal().click(() => $.post("/judgeSubmissionClose", {id: id, version: $("#version").val()} ));
+            }
         });
     }
 

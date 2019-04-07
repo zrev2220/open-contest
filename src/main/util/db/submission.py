@@ -27,6 +27,7 @@ class Submission:
             self.result      = details["result"]
             self.status      = details["status"]
             self.checkout    = details["checkout"]
+            self.version     = details["version"]
         else:
             self.id          = None
             self.user        = None
@@ -43,6 +44,7 @@ class Submission:
             self.result      = []
             self.status      = None
             self.checkout    = None
+            self.version     = 1
 
     def get(id: str):
         with lock.gen_rlock():
@@ -67,6 +69,7 @@ class Submission:
             "result":    self.result,
             "status":    self.status,
             "checkout":  self.checkout,
+            "version":   self.version,
         }
 
     def getContestantResult(self):
@@ -121,6 +124,7 @@ class Submission:
                 "result":    self.result,
                 "status":    self.status,
                 "checkout":  self.checkout,
+                "version":   self.version,
             }
 
     def forEach(callback: callable):
