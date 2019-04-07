@@ -43,7 +43,7 @@ def editContest(params, user):
     scoreboardOff = (time.time() + 2700) * 1000
     if contest:
         title = contest.name
-        start = contest.startchooseProblemchooseProblem
+        start = contest.start
         end = contest.end
         scoreboardOff = contest.scoreboardOff
         chooseProblem = div(cls="actions", contents=[

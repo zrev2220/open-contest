@@ -101,7 +101,11 @@ def leaderboard(params, user):
                 *problemSummaryDisplay
             )
 
-        )
+        ),
+        h.br(), h.br(), h.br(),
+        div(cls="actions", contents=[
+            h.button("Detailed Report", cls="button correct-log", onclick="window.location='/detailedReport'")
+        ])
     )
 
 def score(submissions: list, contestStart, problemSummary) -> tuple:

@@ -101,24 +101,25 @@ def runCode(sub):
     sub.outputs = outputs
     sub.answers = answers
     sub.errors = errors
-    if all(i == "ok" for i in results): #sub.user.id not in sub.problem.contests[Contest.getCurrent()]["completed"]:
-        #sub.problem.contests[Contest.getCurrent()]["completed"].append(sub.user.id)
+    contestDict = sub.problem.contests[Contest.getCurrent().id]
+    if all(i == "ok" for i in results) and sub.user.id not in contestDict["completed"]:
+        contestDict["completed"].append(sub.user.id)
         if sub.language == 'c':
-            sub.problem.contests[Contest.getCurrent()]["c"] += 1
+            contestDict["c"] += 1
         elif sub.language == 'cpp':
-            sub.problem.contests[Contest.getCurrent()]["cpp"] += 1
+            contestDict["cpp"] += 1
         elif sub.language == 'cs':
-            sub.problem.contests[Contest.getCurrent()]["cs"] += 1
+            contestDict["cs"] += 1
         elif sub.language == 'java':
-            sub.problem.contests[Contest.getCurrent()]["java"] += 1
+            contestDict["java"] += 1
         elif sub.language == 'python2':
-            sub.problem.contests[Contest.getCurrent().id]["python2"] += 1
+            contestDict["python2"] += 1
         elif sub.language == 'python3':
-            sub.problem.contests[Contest.getCurrent()]["python3"] += 1
+            contestDict["python3"] += 1
         elif sub.language == 'ruby':
-            sub.problem.contests[Contest.getCurrent()]["ruby"] += 1
+            contestDict["ruby"] += 1
         elif sub.language == 'vb':
-            sub.problem.contests[Contest.getCurrent()]["vb"] += vb
+            contestDict["vb"] += vb
 
     if sub.type == "submit":
         sub.save()
@@ -138,24 +139,31 @@ def submit(params, setHeader, user):
 def changeResult(params, setHeader, user):
     id = params["id"]
     sub = Submission.get(id)
-    if params["result"] != "ok" and sub.user.id in sub.problem.contests[Contest.getCurrent()]["completed"]:
-        sub.problem.contests[Contest.getCurrent()]["completed"].remove(sub.user.id)
+    contestDict = sub.problem.contests[Contest.getCurrent().id]
+
+    scoreChange = -1 if params["result"] != "ok" else 1
+    if (sub.user.id in contestDict["completed"] and scoreChange == -1) or (sub.user.id not in contestDict["completed"] and scoreChange == 1):
+        if scoreChange == -1:
+            contestDict["completed"].remove(sub.user.id)
+        else:
+            contestDict["completed"].append(sub.user.id)
+
         if sub.language == 'c':
-            sub.problem.contests[Contest.getCurrent()]['c'] -= 1
+            contestDict['c'] += scoreChange
         elif sub.language == 'cpp':
-            sub.problem.contests[Contest.getCurrent()]['cpp'] -= 1
+            contestDict['cpp'] += scoreChange
         elif sub.language == 'cs':
-            sub.problem.contests[Contest.getCurrent()]['cs'] -= 1
+            contestDict['cs'] += scoreChange
         elif sub.language == 'java':
-            sub.problem.contests[Contest.getCurrent()]['java'] -= 1
+            contestDict['java'] += scoreChange
         elif sub.language == 'python2':
-            sub.problem.contests[Contest.getCurrent()]['python2'] -= 1
+            contestDict['python2'] += scoreChange
         elif sub.language == 'python3':
-            sub.problem.contests[Contest.getCurrent()]['python3'] -= 1
+            contestDict['python3'] += scoreChange
         elif sub.language == 'ruby':
-            sub.problem.contests[Contest.getCurrent()]['ruby'] -= 1
+            contestDict['ruby'] += scoreChange
         elif sub.language == 'vb':
-            sub.problem.contests[Contest.getCurrent()]['vb'] -= vb
+            contestDict['vb'] += scoreChange
     if not sub:
         return "Error: incorrect id"
     sub.result = params["result"]

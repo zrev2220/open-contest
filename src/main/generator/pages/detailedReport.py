@@ -48,7 +48,6 @@ def detailedReport(params, user):
             attempts
         ))
        
-    print(scores)
     scores = sorted(scores, key=lambda score: score[2] * 1000000000 + score[3] * 10000000 - score[4], reverse=True)
     
     ranks = [i + 1 for i in range(len(scores))]
@@ -63,19 +62,20 @@ def detailedReport(params, user):
         attmpts = []
         for attmpt in attempts:
             attmpts.append(h.td(attmpt, cls="center"))
-        scoresDisplay.append(h.tr(
-            h.td(rank, cls="center"),
-            h.td(name) if contest.end <= time.time() * 1000 else '',
-            h.td(usrID, cls="center"),
-            h.td(solved, cls="center"),
-            h.td(points, cls="center"),
-            *attmpts
-        ))
+            scoresDisplay.append(h.tr(
+                h.td(rank, cls="center"),
+                h.td(name) if contest.end <= time.time() * 1000 else '',
+                h.td(usrID, cls="center"),
+                h.td(solved, cls="center"),
+                h.td(points, cls="center"),
+                *attmpts
+            ))
 
     problemSummaryDisplay = []
     languageSummaryDisplay = []
     cnt = 1
     for problem in contest.problems:
+        contestDict = problem.contests[contest.id]
         problemSummaryDisplay.append(h.tr(
             h.td(cnt),
             h.td(problem.title),
@@ -85,14 +85,14 @@ def detailedReport(params, user):
         languageSummaryDisplay.append(h.tr(
             h.td(cnt),
             h.td(problem.title),
-            h.td(problem.c, cls="center"),
-            h.td(problem.cpp, cls="center"),
-            h.td(problem.cs, cls="center"),
-            h.td(problem.java, cls="center"),
-            h.td(problem.python2, cls="center"),
-            h.td(problem.python3, cls="center"),
-            h.td(problem.ruby, cls="center"),
-            h.td(problem.vb, cls="center")
+            h.td(contestDict["c"], cls="center"),
+            h.td(contestDict["cpp"], cls="center"),
+            h.td(contestDict["cs"], cls="center"),
+            h.td(contestDict["java"], cls="center"),
+            h.td(contestDict["python2"], cls="center"),
+            h.td(contestDict["python3"], cls="center"),
+            h.td(contestDict["ruby"], cls="center"),
+            h.td(contestDict["vb"], cls="center")
         ))
         cnt += 1
 
