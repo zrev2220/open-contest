@@ -63,6 +63,8 @@ class TestCaseTab(UIElement):
 class TestCaseData(UIElement):
     def __init__(self, x, sub):
         num, input, output, error, answer = x
+        if input is None:
+            input = ""
         if output is None:
             output = ""
         self.html = div(id=f"tabs-{sub.id}-{num}", contents=[
