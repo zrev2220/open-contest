@@ -65,7 +65,7 @@ General page code
         }
         $(".result-tabs").tabs();
         // $(".tablesorter").tablesorter();
-        var props = {  
+        var props = {
             sort: true,  
             filters_row_index:1,  
             remember_grid_values: true,  
@@ -76,10 +76,13 @@ General page code
                 values: [],
                 sorts: []
             }
-        }  
-    if ($("#submissions").length) {
-        var tf = setFilterGrid("submissions",props); 
-    }
+        }
+        if ($("#submissions").length) {
+            var tf = new TableFilter("submissions", props);
+            tf.init();
+            tf.setFilterValue(5, "Review");
+            tf.filter();
+        }
     });
 /*--------------------------------------------------------------------------------------------------
 Problem page
@@ -162,13 +165,15 @@ Problem page
         "ok": "check",
         "wrong_answer": "times",
         "tle": "clock",
-        "runtime_error": "exclamation-triangle"
+        "runtime_error": "exclamation-triangle",
+        "pending": "sync",
     };
     var verdict_name = {
         "ok": "Accepted",
         "wrong_answer": "Wrong Answer",
         "tle": "Time Limit Exceeded",
-        "runtime_error": "Runtime Error"
+        "runtime_error": "Runtime Error",
+        "pending": "Pending Review",
     };
 
     function showResults(sub) {
@@ -667,9 +672,10 @@ Messages Page
 /*--------------------------------------------------------------------------------------------------
 Judging Page
 --------------------------------------------------------------------------------------------------*/
-    function changeSubmissionResult(id) {
+    function changeSubmissionResult(id, version) {
         var result = $(`.result-choice.${id}`).val();
-        $.post("/changeResult", {id: id, result: result}, result => {
+        var status = $(`.status-choice.${id}`).val();
+        $.post("/changeResult", {id: id, result: result, status: status, version: version}, result => {
             if (result == "ok") {
                 window.location.reload();
             } else {
@@ -678,12 +684,20 @@ Judging Page
         })
     }
 
-    function submissionPopup(id) {
-        $.post(`/judgeSubmission/${id}`, {}, data => {
-            $(".modal-dialog").html(data);
-            $(".result-tabs").tabs();
-            fixFormatting();
-            $(".modal").modal();
+    function submissionPopup(id, force) {
+        var url = `/judgeSubmission/${id}` + (force ? "/force" : "");
+        $.post(url, {}, data => {
+            if (data.startsWith("CONFLICT") && !force) {
+                var otherJudge = data.slice(data.indexOf(":")+1, data.length);
+                if (window.confirm(`${otherJudge} is already reviewing this submission. Do you want to override with your review?`))
+                    submissionPopup(id, true);
+            }
+            else {
+                $(".modal-dialog").html(data);
+                $(".result-tabs").tabs();
+                fixFormatting();
+                $(".modal").modal().click(() => $.post("/judgeSubmissionClose", {id: id, version: $("#version").val()} ));
+            }
         });
     }
 
