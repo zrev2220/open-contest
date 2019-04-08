@@ -687,6 +687,15 @@ Judging Page
         });
     }
 
+    function submissionPopupContestant(id) {
+        $.post(`/contestantSubmission/${id}`, {}, data => {
+            $(".modal-dialog").html(data);
+            $(".result-tabs").tabs();
+            fixFormatting();
+            $(".modal").modal();
+        });
+    }
+
     function rejudge(id) {
         $(".rejudge").attr("disabled", true);
         $(".rejudge").addClass("button-gray");
