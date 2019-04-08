@@ -30,10 +30,6 @@ class SubmissionCard(UIElement):
                 h.br(),
                 h.strong("Code:"),
                 h.code(submission.code.replace("\n", "<br/>").replace(" ", "&nbsp;"), cls="code"),
-                # div(cls="result-tabs", id="result-tabs", contents=[
-                #     h.ul(*map(lambda x: TestCaseTab(x, submission), enumerate(submission.results))),
-                #     *map(lambda x: TestCaseData(x, submission), zip(range(submission.problem.tests), submission.inputs, submission.outputs, submission.errors, submission.answers))
-                # ])
             ])
         ])
 
@@ -42,7 +38,7 @@ class SubmissionRow(UIElement):
         result = sub.getContestantResult()
         self.html = h.tr(
             h.td(sub.problem.title),
-            h.td(cls='time-format', contents=sub.timestamp),
+            h.td(cls='time-format', data_timestamp=sub.timestamp, contents=sub.timestamp),
             h.td(sub.language),
             h.td(
                 h.i("&nbsp;", cls=f"fa fa-{icons[result]}"),
