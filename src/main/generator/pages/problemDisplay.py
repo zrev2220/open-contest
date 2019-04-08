@@ -70,9 +70,6 @@ def listProblems(params, user):
         probCards = []
         for prob in contest.problems:
             contents = [prob.description]
-            # if user.isAdmin():
-            #     contents.append(h.br())
-            #     contents.append(h.button("Rejudge All", type="button", onclick=f"rejudgeAll('{prob.id}')", cls="btn btn-primary"))
             probCards.append(Card(
                 prob.title,
                 contents,
