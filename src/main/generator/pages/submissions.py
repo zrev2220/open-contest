@@ -82,7 +82,7 @@ def getSubmissions(params, user):
         )
     return Page(
         h2("Your Submissions", cls="page-title"),
-        SubmissionTable(submissions),
+        SubmissionTable(sorted(submissions, key=lambda sub: (sub.problem.title, -sub.timestamp))),
         div(cls="modal", tabindex="-1", role="dialog", contents=[
             div(cls="modal-dialog", role="document", contents=[
                 div(id="modal-content")
@@ -91,7 +91,6 @@ def getSubmissions(params, user):
     )
 
 def contestant_submission(params, user):
-    print(SubmissionCard(Submission.get(params[0])))
     return SubmissionCard(Submission.get(params[0]))
 
 register.web("/submissions", "loggedin", getSubmissions)
