@@ -173,7 +173,7 @@ Problem page
         "wrong_answer": "Wrong Answer",
         "tle": "Time Limit Exceeded",
         "runtime_error": "Runtime Error",
-        "pending": "Pending",
+        "pending": "Pending Review",
     };
 
     function showResults(sub) {

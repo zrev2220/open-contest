@@ -29,7 +29,7 @@ verdict_name = {
     "runtime_error": "Runtime Error",
     "presentation_error": "Presentation Error",
     "extra_output": "Extra Output",
-    "pending": "Pending..."
+    "pending": "Pending Review"
 }
 
 def resultOptions(result):
