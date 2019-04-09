@@ -58,6 +58,10 @@ class TestCaseTab(UIElement):
 class TestCaseData(UIElement):
     def __init__(self, x, sub):
         num, input, output, error, answer = x
+        if input is None:
+            input = ""
+        if output is None:
+            output = ""
         self.html = div(id=f"tabs-{sub.id}-{num}", contents=[
             div(cls="row", contents=[
                 div(cls="col-12", contents=[
@@ -126,7 +130,7 @@ class SubmissionRow(UIElement):
         self.html = h.tr(
             h.td(sub.user.username),
             h.td(sub.problem.title),
-            h.td(cls='time-format', contents=sub.timestamp),
+            h.td(cls='time-format', data_timestamp=sub.timestamp, contents=sub.timestamp),
             h.td(sub.language),
             h.td(
                 h.i("&nbsp;", cls=f"fa fa-{icons[sub.result]}"),
