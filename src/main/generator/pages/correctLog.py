@@ -34,7 +34,7 @@ def correctLog(params, user):
     logDisplay = []
     for (tmstmp, usr, ttl, id) in log:
         logDisplay.append(h.tr(
-            h.td(tmstmp, cls='time-format'),
+            h.td(tmstmp, cls='time-format', data_timestamp=tmstmp),
             h.td(usr),
             h.td(ttl, cls="center"),
         ))
