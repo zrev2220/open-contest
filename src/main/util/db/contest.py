@@ -18,6 +18,7 @@ class Contest:
             self.start    = int(details["start"])
             self.end      = int(details["end"])
             self.scoreboardOff = int(details.get("scoreboardOff", self.end))
+            self.probInfoBlocks = bool(details["probInfoBlocks"])
             self.problems = [Problem.get(id) for id in details["problems"]]
         else:
             self.id = None
@@ -25,6 +26,7 @@ class Contest:
             self.start = None
             self.end = None
             self.scoreboardOff = None
+            self.probInfoBlocks = True
             self.problems = None            
 
     def get(id: str):
@@ -40,6 +42,7 @@ class Contest:
             "start": self.start,
             "end": self.end,
             "scoreboardOff": self.scoreboardOff,
+            "probInfoBlocks": self.probInfoBlocks,
             "problems": [prob.id for prob in self.problems]
         }
 
@@ -64,6 +67,8 @@ class Contest:
                 "name": self.name,
                 "start": self.start,
                 "end": self.end,
+                "scoreboardOff": self.scoreboardOff,
+                "probInfoBlocks": self.probInfoBlocks,
                 "problems": [prob.toJSONSimple() for prob in self.problems]
             }
     

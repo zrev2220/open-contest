@@ -414,6 +414,7 @@ Contest page
         var startTime = $("#contest-start-time").val();
         var endDate = $("#contest-end-date").val();
         var endTime = $("#contest-end-time").val();
+        var probInfoBlocks = $("#prob-info-blocks").val();
         var scoreboardOffTime = $("#scoreboard-off-time").val();
 
         var start = new Date(`${startDate} ${startTime}`).getTime();
@@ -446,7 +447,7 @@ Contest page
             problems.push(newProblem);
         }
 
-        $.post("/editContest", {id: id, name: name, start: start, end: end, scoreboardOff: endScoreboard, problems: JSON.stringify(problems)}, id => {
+        $.post("/editContest", {id: id, name: name, start: start, end: end, probInfoBlocks: probInfoBlocks, scoreboardOff: endScoreboard, problems: JSON.stringify(problems)}, id => {
             if (window.location.pathname == "/contests/new") {
                 window.location = `/contests/${id}`;
             } else {
