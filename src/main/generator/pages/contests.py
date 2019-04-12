@@ -41,16 +41,16 @@ def editContest(params, user):
     start = time.time() * 1000
     end = (time.time() + 3600) * 1000
     scoreboardOff = (time.time() + 2700) * 1000
-    checked = ""
     probInfoBlocks = True
+    tieBreaker = ""
     if contest:
         title = contest.name
         start = contest.start
         end = contest.end
-        checked = 'checked' if contest.tieBreaker else ""
 
         scoreboardOff = contest.scoreboardOff
         probInfoBlocks = contest.probInfoBlocks
+        tieBreaker = contest.tieBreaker
         chooseProblem = div(cls="actions", contents=[
             h.button("+ Choose Problem", cls="button", onclick="chooseProblemDialog()")
         ])
@@ -105,7 +105,7 @@ def editContest(params, user):
                 div(cls="form-group col-6", contents=[
                     h.label(**{"for": "prob-info-blocks", "contents":"Display Problem Info Blocks"}),
                     h.select(cls="form-control", name="prob-info-blocks", id="prob-info-blocks", contents=[
-                        *[h.option(text, value=val, selected="selected") if probInfoBlocks == val else \
+                        *[h.option(text, value=val, selected="selected") if probInfoBlocks == val else
                           h.option(text, value=val) for text, val in zip(("On", "Off"), (True, False))]
                     ])
                 ]),
@@ -116,9 +116,11 @@ def editContest(params, user):
                 h.input(type="hidden", id="scoreboardOff", value=scoreboardOff),
                 div(cls="form-group col-6", contents=[
                     h.label(**{"for": "scoreboard-tie-breaker", "contents":"Sample Data Breaks Ties"}),
-                    h.input(cls="form-control", name="scoreboard-tie-breaker", id="scoreboard-tie-breaker", type="checkbox", style="align-items: left;", attr=checked)
-                ],
-                attr=checked)
+                    h.select(cls="form-control", name="scoreboard-tie-breaker", id="scoreboard-tie-breaker", contents=[
+                        *[h.option(text, value=val, selected="selected") if tieBreaker == val else
+                          h.option(text, value=val) for text, val in zip(("On", "Off"), (True, False))]
+                    ])
+                ])
             ]),
             div(cls="align-right col-12", contents=[
                 h.button("Save", cls="button", onclick="editContest()")

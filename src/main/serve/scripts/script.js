@@ -416,7 +416,7 @@ Contest page
         var endTime = $("#contest-end-time").val();
         var probInfoBlocks = $("#prob-info-blocks").val();
         var scoreboardOffTime = $("#scoreboard-off-time").val();
-        var tieBreaker = $("#scoreboard-tie-breaker").prop("checked");
+        var tieBreaker = $("#scoreboard-tie-breaker").val();
 
         var start = new Date(`${startDate} ${startTime}`).getTime();
         var end = new Date(`${endDate} ${endTime}`).getTime();
