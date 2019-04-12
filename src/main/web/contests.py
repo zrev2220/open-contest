@@ -17,6 +17,10 @@ def editContest(params, setHeader, user):
     contest.scoreboardOff = int(params["scoreboardOff"])
     contest.probInfoBlocks = bool(params["probInfoBlocks"])
     contest.problems = [Problem.get(id) for id in json.loads(params["problems"])]
+    if str(params["tieBreaker"]).lower() == "true":
+        contest.tieBreaker = True
+    else:
+        contest.tieBreaker = False
 
     contest.save()
 

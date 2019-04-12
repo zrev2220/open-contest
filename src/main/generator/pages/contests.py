@@ -34,18 +34,21 @@ class ProblemCard(UIElement):
 def editContest(params, user):
     id = params[0] if params else None
     contest = Contest.get(id)
-    
+
     title = "New Contest"
     chooseProblem = ""
     existingProblems = []
     start = time.time() * 1000
     end = (time.time() + 3600) * 1000
     scoreboardOff = (time.time() + 2700) * 1000
+    checked = ""
     probInfoBlocks = True
     if contest:
         title = contest.name
         start = contest.start
         end = contest.end
+        checked = 'checked' if contest.tieBreaker else ""
+
         scoreboardOff = contest.scoreboardOff
         probInfoBlocks = contest.probInfoBlocks
         chooseProblem = div(cls="actions", contents=[
@@ -106,11 +109,16 @@ def editContest(params, user):
                           h.option(text, value=val) for text, val in zip(("On", "Off"), (True, False))]
                     ])
                 ]),
-                h.input(type="hidden", id="scoreboardOff", value=scoreboardOff),
                 div(cls="form-group col-6", contents=[
                     h.label(**{"for": "scoreboard-off-time", "contents":"Turn Scoreboard Off Time"}),
                     h.input(cls="form-control", name="scoreboard-off-time", id="scoreboard-off-time", type="time")
-                ])
+                ]),
+                h.input(type="hidden", id="scoreboardOff", value=scoreboardOff),
+                div(cls="form-group col-6", contents=[
+                    h.label(**{"for": "scoreboard-tie-breaker", "contents":"Sample Data Breaks Ties"}),
+                    h.input(cls="form-control", name="scoreboard-tie-breaker", id="scoreboard-tie-breaker", type="checkbox", style="align-items: left;", attr=checked)
+                ],
+                attr=checked)
             ]),
             div(cls="align-right col-12", contents=[
                 h.button("Save", cls="button", onclick="editContest()")
