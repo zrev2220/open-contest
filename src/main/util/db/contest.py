@@ -18,7 +18,7 @@ class Contest:
             self.start    = int(details["start"])
             self.end      = int(details["end"])
             self.scoreboardOff = int(details.get("scoreboardOff", self.end))
-            self.probInfoBlocks = bool(details["probInfoBlocks"])
+            self.probInfoBlocks = details["probInfoBlocks"] == "True"
             self.problems = [Problem.get(id) for id in details["problems"]]
             if str(details["tieBreaker"]).lower() == "true":
                 self.tieBreaker = True
@@ -58,8 +58,6 @@ class Contest:
             if self.id == None:
                 self.id = str(uuid4())
                 contests[self.id] = self
-            print(self.probInfoBlocks)
-            print(self.toJSONSimple())
             setKey(f"/contests/{self.id}/contest.json", self.toJSONSimple())
         for callback in Contest.saveCallbacks:
             callback(self)
