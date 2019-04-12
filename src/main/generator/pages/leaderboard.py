@@ -157,7 +157,7 @@ def score(submissions: list, contestStart, problemSummary) -> tuple:
             solvedProbs += 1
             penPoints += points
             problemSummary[sub.problem.id][1] += 1
-        elif contest.tieBreaker:
+        elif contest.tieBreaker and sampleSolved:
             sampleProbs += 1
     
     # The user's score is dependent on the number of solved problems and the number of penalty points

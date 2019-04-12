@@ -48,7 +48,7 @@ class Contest:
             "start": self.start,
             "end": self.end,
             "scoreboardOff": self.scoreboardOff,
-            "tieBreaker" : self.tieBreaker
+            "tieBreaker" : self.tieBreaker,
             "probInfoBlocks": self.probInfoBlocks,
             "problems": [prob.id for prob in self.problems]
         }
@@ -58,6 +58,8 @@ class Contest:
             if self.id == None:
                 self.id = str(uuid4())
                 contests[self.id] = self
+            print(self.probInfoBlocks)
+            print(self.toJSONSimple())
             setKey(f"/contests/{self.id}/contest.json", self.toJSONSimple())
         for callback in Contest.saveCallbacks:
             callback(self)
@@ -74,7 +76,7 @@ class Contest:
                 "name": self.name,
                 "start": self.start,
                 "end": self.end,
-                "tieBreaker": self.tieBreaker
+                "tieBreaker": self.tieBreaker,
                 "scoreboardOff": self.scoreboardOff,
                 "probInfoBlocks": self.probInfoBlocks,
                 "problems": [prob.toJSONSimple() for prob in self.problems]
