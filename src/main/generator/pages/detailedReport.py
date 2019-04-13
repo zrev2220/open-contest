@@ -36,18 +36,17 @@ def detailedReport(params, user):
     for user in subs:
         usersubs = subs[user]
         scor = score(usersubs, start, problemSummary)
-        attempts = []
+        atempts = []
         for i in getDetails(usersubs, contest):
-            attempts.append(i)
+            atempts.append(i)
         scores.append((
             User.get(user).username,
             User.get(user).id,
             scor[0],
             scor[1],
             scor[2],
-            attempts
+            atempts
         ))
-       
     scores = sorted(scores, key=lambda score: score[2] * 1000000000 + score[3] * 10000000 - score[4], reverse=True)
     
     ranks = [i + 1 for i in range(len(scores))]
@@ -56,21 +55,20 @@ def detailedReport(params, user):
         u2 = scores[i - 1]
         if (u1[1], u1[2], u1[3]) == (u2[1], u2[2], u2[3]):
             ranks[i] = ranks[i - 1]
-    
-    scoresDisplay = []
-    for (name, usrID, solved, samples, points, attempts), rank in zip(scores, ranks):
-        attmpts = []
-        for attmpt in attempts:
-            attmpts.append(h.td(attmpt, cls="center"))
-            scoresDisplay.append(h.tr(
-                h.td(rank, cls="center"),
-                h.td(name) if contest.end <= time.time() * 1000 else '',
-                h.td(usrID, cls="center"),
-                h.td(solved, cls="center"),
-                h.td(points, cls="center"),
-                *attmpts
-            ))
 
+    scoresDisplay = []
+    for (name, usrID, solved, samples, points, atempts), rank in zip(scores, ranks):
+        atmpts = []
+        for atmpt in atempts:
+            atmpts.append(h.td(atmpt, cls="center"))
+        scoresDisplay.append(h.tr(
+            h.td(rank, cls="center"),
+            h.td(name) if contest.end <= time.time() * 1000 else '',
+            h.td(usrID, cls="center"),
+            h.td(solved, cls="center"),
+            h.td(points, cls="center"),
+            *atmpts
+        ))
     problemSummaryDisplay = []
     languageSummaryDisplay = []
     cnt = 1
@@ -182,8 +180,6 @@ def getDetails(submissions: list, contest):
 
 
 def score(submissions: list, contestStart, problemSummary) -> tuple:
-    """ Given a list of submissions by a particular user, calculate that user's score.
-        Calculates score in ACM format. """
     
     solvedProbs = 0
     sampleProbs = 0

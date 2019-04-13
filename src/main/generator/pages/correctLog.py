@@ -5,6 +5,7 @@ import logging
 from operator import itemgetter
 from code.util import register
 import time
+import operator
 
 def correctLog(params, user):
     contest = Contest.getCurrent() or Contest.getPast()
@@ -82,7 +83,8 @@ def createLog(submissions: list) -> tuple:
                     temp = (sub.timestamp, User.get(user).username, sub.problem.title, sub.problem.id)
                     log.append(temp)       
 
-    sorted(log, key=lambda x: x[1], reverse=True)
+    log.sort(key = operator.itemgetter(0), reverse=True)
+    print(log)
     return log
 
 register.web("/correctLog", "loggedin", correctLog)

@@ -106,7 +106,7 @@ def leaderboard(params, user):
         ),
         h.br(), h.br(), h.br(),
         div(cls="actions", contents=[
-            h.button("Detailed Report", cls="button correct-log", onclick="window.location='/detailedReport'")
+            h.button("Detailed Report", cls="button correct-log", onclick="window.location='/detailedReport'"),
             h.button("Correct Log", cls="button correct-log", onclick="window.location='/correctLog'")
         ])
     )
