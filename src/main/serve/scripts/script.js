@@ -602,6 +602,11 @@ General
             var d = new Date(parseInt(timestamp));
             $(span).text(d.toLocaleString());
         });
+        $(".time-format-hour").each((_, span) => {
+            var timestamp = $(span).text();
+            var d = new Date(parseInt(timestamp));
+            $(span).text(d.toLocaleTimeString());
+        });
         await getLanguages();
         $("span.language-format").each((_, span) => {
             var lang = $(span).text();
