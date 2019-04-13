@@ -414,7 +414,9 @@ Contest page
         var startTime = $("#contest-start-time").val();
         var endDate = $("#contest-end-date").val();
         var endTime = $("#contest-end-time").val();
+        var probInfoBlocks = $("#prob-info-blocks").val();
         var scoreboardOffTime = $("#scoreboard-off-time").val();
+        var tieBreaker = $("#scoreboard-tie-breaker").val();
 
         var start = new Date(`${startDate} ${startTime}`).getTime();
         var end = new Date(`${endDate} ${endTime}`).getTime();
@@ -445,8 +447,7 @@ Contest page
         if (newProblem != undefined) {
             problems.push(newProblem);
         }
-
-        $.post("/editContest", {id: id, name: name, start: start, end: end, scoreboardOff: endScoreboard, problems: JSON.stringify(problems)}, id => {
+        $.post("/editContest", {id: id, name: name, start: start, end: end, probInfoBlocks: probInfoBlocks,  tieBreaker: tieBreaker.toString(), scoreboardOff: endScoreboard, problems: JSON.stringify(problems)}, id => {
             if (window.location.pathname == "/contests/new") {
                 window.location = `/contests/${id}`;
             } else {

@@ -46,15 +46,21 @@ def viewProblem(params, user):
             return ""
         if problem not in Contest.getCurrent().problems:
             return ""
+
+    cards = []
+    if Contest.getCurrent() is None or Contest.getCurrent().probInfoBlocks:
+        cards = [
+            Card("Problem Statement", formatMD(problem.statement), cls="stmt"),
+            Card("Input Format", formatMD(problem.input), cls="inp"),
+            Card("Output Format", formatMD(problem.output), cls="outp"),
+            Card("Constraints", formatMD(problem.constraints), cls="constraints"),
+        ]
     
     return Page(
         h.input(type="hidden", id="problem-id", value=problem.id),
         h2(problem.title, cls="page-title"),
         div(cls="problem-description", contents=[
-            Card("Problem Statement", formatMD(problem.statement), cls="stmt"),
-            Card("Input Format", formatMD(problem.input), cls="inp"),
-            Card("Output Format", formatMD(problem.output), cls="outp"),
-            Card("Constraints", formatMD(problem.constraints), cls="constraints"),
+            *cards,
             div(cls="samples", contents=list(map(lambda x: getSample(x[0], x[1]), zip(problem.sampleData, range(problem.samples)))))
         ]),
         CodeEditor(),
@@ -72,7 +78,12 @@ def listProblems(params, user):
             probCards.append(Card(
                 prob.title,
                 prob.description,
-                f"/problems/{prob.id}"
+                f"/problems/{prob.id}",
+                None,
+                None,
+                None,
+                user,
+                prob.id
             ))
         return Page(
             h2("Problems", cls="page-title"),
