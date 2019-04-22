@@ -621,7 +621,7 @@ General
 --------------------------------------------------------------------------------------------------*/
     async function fixFormatting() {
         $(".time-format").each((_, span) => {
-            var timestamp = $(span).text();
+            var timestamp = $(span).attr("data_timestamp");
             var d = new Date(parseInt(timestamp));
             $(span).text(d.toLocaleString());
         });
