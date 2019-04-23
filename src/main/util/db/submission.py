@@ -108,6 +108,8 @@ class Submission:
                     "compile":   self.compile,
                     "results":   self.results
                 }
+            
+            
             return {
                 "id":        self.id,
                 "user":      self.user.id,
@@ -124,7 +126,7 @@ class Submission:
                 "result":    self.result,
                 "status":    self.status,
                 "checkout":  self.checkout,
-                "version": self.version,
+                "version":   self.version,
             }
 
     def forEach(callback: callable):

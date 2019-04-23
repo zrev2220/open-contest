@@ -7,7 +7,7 @@ import shutil
 import re
 from uuid import uuid4
 
-def addSubmission(probId, lang, code, user, type):
+def addSubmission(probId, lang, code, user, type, custominput):
     sub = Submission()
     sub.problem = Problem.get(probId)
     sub.language = lang
@@ -17,8 +17,12 @@ def addSubmission(probId, lang, code, user, type):
     sub.timestamp = time.time() * 1000
     sub.type = type
     sub.status = "Review"
+    
     if type == "submit":
         sub.save()
+    elif type == "custom":
+        sub.custominput = custominput
+        sub.id = str(uuid4())
     else:
         sub.id = str(uuid4())
     return sub
@@ -52,11 +56,26 @@ def runCode(sub):
         f.write(sub.code.encode("utf-8"))
     
     prob = sub.problem
-    tests = prob.samples if sub.type == "test" else prob.tests
     
+    if sub.type == "test":
+        tests = prob.samples 
+    elif sub.type == "custom":
+        tests = 1
+    else:
+        tests = prob.tests     
     # Copy the input over to the tmp folder for the runner
-    for i in range(tests):
-        shutil.copyfile(f"/db/problems/{prob.id}/input/in{i}.txt", f"/tmp/{sub.id}/in{i}.txt")
+    
+    
+   
+    if sub.type != "custom":
+        for i in range(tests):
+            shutil.copyfile(f"/db/problems/{prob.id}/input/in{i}.txt", f"/tmp/{sub.id}/in{i}.txt") 
+    else:
+        with open(f"/tmp/{sub.id}/in0.txt", "w") as text_file:
+            if(sub.custominput == None):
+                sub.custominput = ""
+            text_file.write(sub.custominput)    
+
 
     # Output files will go here
     os.mkdir(f"/tmp/{sub.id}/out")
@@ -72,22 +91,61 @@ def runCode(sub):
     results = []
     result = "ok"
 
-    for i in range(tests):
-        inputs.append(sub.problem.testData[i].input)
-        errors.append(readFile(f"/tmp/{sub.id}/out/err{i}.txt"))
-        outputs.append(readFile(f"/tmp/{sub.id}/out/out{i}.txt"))
-        answers.append(sub.problem.testData[i].output)
+    if sub.type != "custom":
+        for i in range(tests):
+            inputs.append(sub.problem.testData[i].input)
+            errors.append(readFile(f"/tmp/{sub.id}/out/err{i}.txt"))
+            outputs.append(readFile(f"/tmp/{sub.id}/out/out{i}.txt"))
+            answers.append(sub.problem.testData[i].output)
+
+            anstrip = strip((answers[-1] or "").rstrip()).splitlines()
+            outstrip = strip((outputs[-1] or "").rstrip()).splitlines()
+
+            res = readFile(f"/tmp/{sub.id}/out/result{i}.txt")
+            if res == "ok" and anstrip != outstrip:
+                extra = False
+                if len(anstrip) < len(outstrip):
+                    extra = True
+                incomplete = False
+                
+                for i in range(len(outstrip)):
+                    if i < len(anstrip):
+                        if anstrip[i] == outstrip[i]:
+                            incomplete = True
+                        else:
+                            extra = False
+                if len(anstrip) < len(outstrip):
+                    incomplete = False
+
+                if not extra and not incomplete:
+                    res = "wrong_answer"
+                elif extra:
+                    res = "extra_output"
+                else:
+                    res = "incomplete_output"
+            if res == None:
+                res = "tle"
+            
+            results.append(res)
+
+            # Make result the first incorrect result
+            if res != "ok" and result == "ok":
+                result = res
+    else:
+        inputs.append(sub.custominput)
+        outputs.append(readFile(f"/tmp/{sub.id}/out/out0.txt"))
+        errors.append(readFile(f"/tmp/{sub.id}/out/err0.txt"))
+        if(inputs[0]  != None): inputs[0] =  inputs[0].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        if(outputs[0] != None):outputs[0] = outputs[0].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+        if(errors[0]  != None): errors[0] =  errors[0].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
         
-        res = readFile(f"/tmp/{sub.id}/out/result{i}.txt")
-        if res == "ok" and strip((answers[-1] or "").rstrip()) != strip((outputs[-1] or "").rstrip()):
-            res = "wrong_answer"
+        answers.append("")
+        res = readFile(f"/tmp/{sub.id}/out/result0.txt")
         if res == None:
             res = "tle"
-        results.append(res)
-
-        # Make result the first incorrect result
         if res != "ok" and result == "ok":
             result = res
+        results.append(res)
 
     sub.result = result
     if sub.result in ["ok", "runtime_error", "tle"]:
@@ -100,14 +158,13 @@ def runCode(sub):
         return
 
     sub.results = results
-    sub.inputs = inputs
+    sub.inputs  = inputs
     sub.outputs = outputs
     sub.answers = answers
-    sub.errors = errors
-
+    sub.errors  = errors
+    
     if sub.type == "submit":
         sub.save()
-
     shutil.rmtree(f"/tmp/{sub.id}", ignore_errors=True)
 
 def submit(params, setHeader, user):
@@ -115,7 +172,8 @@ def submit(params, setHeader, user):
     lang   = params["language"]
     code   = params["code"]
     type   = params["type"]
-    submission = addSubmission(probId, lang, code, user, type)
+    custominput = params.get("input")
+    submission = addSubmission(probId, lang, code, user, type, custominput)
     runCode(submission)
     response = submission.toJSON()
     if submission.type != "test":

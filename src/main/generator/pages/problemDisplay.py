@@ -23,6 +23,8 @@ class CodeEditor(UIElement):
         ])
 
 def getSample(datum, num: int) -> Card:
+    if datum.input == None: datum.input = "" 
+    if datum.output == None: datum.output = "" 
     return Card("Sample #{}".format(num), div(cls="row", contents=[
         div(cls="col-6", contents=[
             h.p("Input:", cls="no-margin"),
@@ -54,11 +56,16 @@ def viewProblem(params, user):
             Card("Problem Statement", formatMD(problem.statement), cls="stmt"),
             Card("Input Format", formatMD(problem.input), cls="inp"),
             Card("Output Format", formatMD(problem.output), cls="outp"),
-            Card("Constraints", formatMD(problem.constraints), cls="constraints"),
+            Card("Constraints", formatMD(problem.constraints), cls="constraints"),       
             div(cls="samples", contents=list(map(lambda x: getSample(x[0], x[1]), zip(problem.sampleData, range(problem.samples)))))
         ]),
         CodeEditor(),
-        div(cls="align-right", contents=[
+        div(cls="stmt card ui-sortable-handle", contents=[
+            div(cls="card-header", contents=[h2("Custom Input", cls="card-title")]),
+            div(cls="card-contents", contents=[h.textarea(id="custom-input", cls="col-12")])
+        ]),
+        div(cls="align-right",id="custom-code-text", contents=[
+            h.button("Test Custom Code", cls="button test-custom button-white"),
             h.button("Test Code", cls="button test-samples button-white"),
             h.button("Submit Code", cls="button submit-problem")
         ])
@@ -102,3 +109,4 @@ def listProblems(params, user):
 
 register.web("/problems$", "loggedin", listProblems)
 register.web("/problems/([0-9a-f-]+)", "loggedin", viewProblem)
+
