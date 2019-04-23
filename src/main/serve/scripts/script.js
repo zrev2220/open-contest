@@ -181,6 +181,8 @@ Problem page
 
     var icons = {
         "ok": "check",
+        "extra_output": "times",
+        "incomplete_output": "times",
         "wrong_answer": "times",
         "tle": "clock",
         "runtime_error": "exclamation-triangle",
@@ -192,6 +194,8 @@ Problem page
     };
     var verdict_name = {
         "ok": "Accepted",
+        "extra_output": "Extra Output",
+        "incomplete_output": "Incomplete Output",
         "wrong_answer": "Wrong Answer",
         "tle": "Time Limit Exceeded",
         "runtime_error": "Runtime Error",
