@@ -200,7 +200,7 @@ Problem page
         "runtime_error": "Runtime Error",
         "presentation_error": "Presentation Error",
         "reject": "Submission Rejected",
-        "pending": "Pending ...",
+        "pending": "Executing ...",
         "pending_review": "Pending Review",
     };
 
