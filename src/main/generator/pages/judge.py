@@ -104,6 +104,7 @@ class SubmissionCard(UIElement):
         subTime = submission.timestamp
         probName = submission.problem.title
         cls = "gray" if submission.status == "Review" else "red" if submission.result != "ok" else ""
+        submission.checkout = user.id
         self.html = div(cls="modal-content", contents=[
             div(cls=f"modal-header {cls}", contents=[
                 h.h5(
