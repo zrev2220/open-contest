@@ -98,7 +98,6 @@ General page code
         if ($("#submissions").length) {
             var tf = new TableFilter("submissions", props);
             tf.init();
-            tf.setFilterValue(5, "Review");
             tf.filter();
         }
     });
