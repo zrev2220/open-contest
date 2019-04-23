@@ -98,6 +98,7 @@ General page code
         if ($("#submissions").length) {
             var tf = new TableFilter("submissions", props);
             tf.init();
+            tf.setFilterValue(5, "Review");
             tf.filter();
         }
     });
@@ -180,17 +181,27 @@ Problem page
 
     var icons = {
         "ok": "check",
+        "extra_output": "times",
+        "incomplete_output": "times",
         "wrong_answer": "times",
         "tle": "clock",
         "runtime_error": "exclamation-triangle",
+        "presentation_error": "times",
+        "reject" : "times",
         "pending": "sync",
+        "pending_review": "sync",
     };
     var verdict_name = {
         "ok": "Accepted",
+        "extra_output": "Extra Output",
+        "incomplete_output": "Incomplete Output",
         "wrong_answer": "Wrong Answer",
         "tle": "Time Limit Exceeded",
         "runtime_error": "Runtime Error",
-        "pending": "Pending Review",
+        "presentation_error": "Presentation Error",
+        "reject": "Submission Rejected",
+        "pending": "Pending ...",
+        "pending_review": "Pending Review",
     };
 
     function showResults(sub) {
@@ -199,15 +210,22 @@ Problem page
                 <h3>Compile Error</h3>
                 <code>${sub.compile.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")}</code>
             `);
-        } else if (sub.type == "test") {
+        } else if (sub.type == "test" || sub.type == "custom") {
             var tabs = "";
             var results = "";
             var samples = sub.results.length;
+            if(sub.type == "custom"){
+                samples = 1;
+            }
             for (var i = 0; i < samples; i ++) {
                 var res = sub.results[i];
                 var icon = icons[res];
-                tabs += `<li><a href="#tabs-${i}"><i class="fa fa-${icon}" title="${verdict_name[res]}"></i> Sample #${i}</a></li>`;
-
+                if (sub.type ==  "test"){
+                    tabs += `<li><a href="#tabs-${i}"><i class="fa fa-${icon}" title="${verdict_name[res]}"></i> Sample #${i}</a></li>`;
+                }
+                if(sub.type == "custom"){
+                    tabs += `<li><a href="#tabs-${i}"><i class="fa fa-${icon}" title="${verdict_name[res]}"></i> Custom </a></li>`;
+                }
                 var input = sub.inputs[i];
                 var output = sub.outputs[i];
                 var error = sub.errors[i];
@@ -219,7 +237,8 @@ Problem page
                 if (!error) {
                     errorStr = "";
                 }
-                results += `<div id="tabs-${i}">
+                if (sub.type ==  "test"){
+                    results += `<div id="tabs-${i}">
                     <div class="row">
                         <div class="col-12">
                             <h4>Input</h4>
@@ -236,6 +255,23 @@ Problem page
                         ${errorStr}
                     </div>
                 </div>`;
+                }
+                if(sub.type == "custom"){
+                    results += `<div id="tabs-${i}">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>Your Input</h4>
+                            <code>${input.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")}</code>
+                        </div>
+                        <div class="col-12">
+                            <h4>Your Output</h4>
+                            <code>${output.replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;")}</code>
+                        </div>
+                        ${errorStr}
+                    </div>
+                </div>`;
+                }
+                
             }
             $(".results.card .card-contents").html(`<div id="result-tabs">
                 <ul>
@@ -298,6 +334,9 @@ Problem page
             $(".submit-problem").addClass("button-gray");
             $(".test-samples").attr("disabled", true);
             $(".test-samples").addClass("button-gray");
+            $(".test-custom").attr("disabled", true);
+            $(".test-custom").addClass("button-gray");
+            
         }
 
         function enableButtons() {
@@ -305,6 +344,8 @@ Problem page
             $(".submit-problem").removeClass("button-gray");
             $(".test-samples").attr("disabled", false);
             $(".test-samples").removeClass("button-gray");
+            $(".test-custom").attr("disabled", false);
+            $(".test-custom").removeClass("button-gray");
         }
 
         // When you click the submit button, submit the code to the server
@@ -324,6 +365,18 @@ Problem page
             var code = editor.getValue();
             disableButtons();
             $.post("/submit", {problem: thisProblem, language: language, code: code, type: "test"}, results => {
+                enableButtons();
+                showResults(results);
+            });
+        });
+
+        // When you click the test custom input code button, test the code with custom input
+        $("button.test-custom").click(_ => {
+            createResultsCard();
+            var code = editor.getValue();
+            var input = $("#custom-input").val();
+            disableButtons();
+            $.post("/submit", {problem: thisProblem, language: language, code: code, type: "custom", input:input}, results => {
                 enableButtons();
                 showResults(results);
             });
@@ -695,10 +748,10 @@ Messages Page
 /*--------------------------------------------------------------------------------------------------
 Judging Page
 --------------------------------------------------------------------------------------------------*/
-    function changeSubmissionResult(id) {
+    function changeSubmissionResult(id, version) {
         var result = $(`.result-choice.${id}`).val();
         var status = $(`.status-choice.${id}`).val();
-        $.post("/changeResult", {id: id, result: result, status: status}, result => {
+        $.post("/changeResult", {id: id, result: result, status: status, version: version}, result => {
             if (result == "ok") {
                 window.location.reload();
             } else {
@@ -707,12 +760,20 @@ Judging Page
         })
     }
 
-    function submissionPopup(id) {
-        $.post(`/judgeSubmission/${id}`, {}, data => {
-            $(".modal-dialog").html(data);
-            $(".result-tabs").tabs();
-            fixFormatting();
-            $(".modal").modal().click(() => $.post("/judgeSubmissionClose", {id: id} ));
+    function submissionPopup(id, force) {
+        var url = `/judgeSubmission/${id}` + (force ? "/force" : "");
+        $.post(url, {}, data => {
+            if (data.startsWith("CONFLICT") && !force) {
+                var otherJudge = data.slice(data.indexOf(":")+1, data.length);
+                if (window.confirm(`${otherJudge} is already reviewing this submission. Do you want to override with your review?`))
+                    submissionPopup(id, true);
+            }
+            else {
+                $(".modal-dialog").html(data);
+                $(".result-tabs").tabs();
+                fixFormatting();
+                $(".modal").modal().click(() => $.post("/judgeSubmissionClose", {id: id, version: $("#version").val()} ));
+            }
         });
     }
 
@@ -736,6 +797,27 @@ Judging Page
         });
     }
 
+    function download(id) {
+        $(".rejudge").attr("disabled", true);
+        $(".rejudge").addClass("button-gray");
+
+        $.post("/download", {id: id}, data => {
+            $(".rejudge").attr("disabled", false);
+            $(".rejudge").removeClass("button-gray");
+            file = JSON.parse(data)
+            jQuery.each(file, (name, value) => {
+                byteCharacters = atob(value)
+                const byteNumbers = new Array(byteCharacters.length)
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i)
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                saveAs(new Blob([byteArray], {type: "application/zip"}, name))
+            })
+            
+        });
+    }
+    
     function getDiff(output, answer) {
 
 
