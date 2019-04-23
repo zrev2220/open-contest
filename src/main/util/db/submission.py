@@ -25,9 +25,9 @@ class Submission:
             self.errors      = details["errors"]
             self.answers     = details["answers"]
             self.result      = details["result"]
-            self.status      = details["status"]
-            self.checkout    = details["checkout"]
-            self.version     = details["version"]
+            self.status      = details.get("status", None)
+            self.checkout    = details.get("checkout", None)
+            self.version     = details.get("version", 1)
         else:
             self.id          = None
             self.user        = None
@@ -69,14 +69,14 @@ class Submission:
             "result":    self.result,
             "status":    self.status,
             "checkout":  self.checkout,
-            "version": self.version,
+            "version":   self.version,
         }
 
     def getContestantResult(self):
-        return self.result if self.status == "Judged" else "pending"
+        return "pending_review" if self.result != "pending" and self.status == "Review" else self.result
 
     def getContestantIndividualResults(self):
-        return [res if res in ["ok", "runtime_error", "tle"] or self.status == "Judged" else "pending" for res in self.results]
+        return ["pending_review" if self.result != "pending" and self.status == "Review" else res for res in self.results]
 
     def save(self):
         with lock.gen_wlock():
@@ -119,10 +119,10 @@ class Submission:
                 "code":      self.code,
                 "type":      self.type,
                 "results":   self.results,
-                "inputs":    self.inputs[:self.problem.samples],
-                "outputs":   self.outputs[:self.problem.samples],
-                "errors":    self.errors[:self.problem.samples],
-                "answers":   self.answers[:self.problem.samples],
+                "inputs":    self.inputs [:self.problem.samples] if self.type != "custom" else self.inputs,
+                "outputs":   self.outputs[:self.problem.samples] if self.type != "custom" else self.outputs,
+                "errors":    self.errors [:self.problem.samples] if self.type != "custom" else self.errors,
+                "answers":   self.answers[:self.problem.samples] if self.type != "custom" else self.answers,
                 "result":    self.result,
                 "status":    self.status,
                 "checkout":  self.checkout,

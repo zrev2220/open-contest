@@ -23,6 +23,7 @@ icons = {
     "incomplete_output" : "times",
     "reject" : "times",
     "pending": "sync",
+    "pending_review": "sync",
 }
 verdict_name = {
     "ok": "Accepted",
@@ -33,7 +34,8 @@ verdict_name = {
     "extra_output": "Extra Output",
     "incomplete_output": "Incomplete Output",
     "reject": "Submission Rejected",
-    "pending": "Pending Review",
+    "pending": "Pending...",
+    "pending_review": "Pending Review",
 }
 
 def resultOptions(result):
@@ -124,10 +126,10 @@ class SubmissionCard(UIElement):
                     ])
                 ),
                 h.strong("&emsp;Status: ",
-                         h.select(cls=f"status-choice {submission.id}", contents=[
-                             *statusOptions(submission.status)
-                         ])
-                         ),
+                    h.select(cls=f"status-choice {submission.id}", contents=[
+                        *statusOptions(submission.status)
+                    ])
+                ),
                 h.span("&emsp;"),
                 h.button("Save", type="button", onclick=f"changeSubmissionResult('{submission.id}', '{submission.version}')", cls="btn btn-primary"),
                 h.br(),
