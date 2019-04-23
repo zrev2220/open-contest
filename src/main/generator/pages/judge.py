@@ -1,5 +1,5 @@
 from code.util import register
-from code.util.db import Contest, Problem, Submission
+from code.util.db import Contest, Problem, Submission, User
 from code.generator.lib.htmllib import *
 from code.generator.lib.page import *
 
@@ -33,7 +33,7 @@ verdict_name = {
     "extra_output": "Extra Output",
     "incomplete_output": "Incomplete Output",
     "reject": "Submission Rejected",
-    "pending": "Pending..."
+    "pending": "Pending Review"
 }
 
 def resultOptions(result):
@@ -43,6 +43,15 @@ def resultOptions(result):
             ans.append(h.option(verdict_name[res], value=res, selected="selected"))
         else:
             ans.append(h.option(verdict_name[res], value=res))
+    return ans
+
+def statusOptions(status):
+    ans = []
+    for stat in ["Review", "Judged"]:
+        if status == stat:
+            ans.append(h.option((stat), value=stat, selected="selected"))
+        else:
+            ans.append(h.option((stat), value=stat))
     return ans
 
 class TestCaseTab(UIElement):
@@ -90,7 +99,7 @@ class SubmissionCard(UIElement):
     def __init__(self, submission: Submission):
         subTime = submission.timestamp
         probName = submission.problem.title
-        cls = "red" if submission.result != "ok" else ""
+        cls = "gray" if submission.status == "Review" else "red" if submission.result != "ok" else ""
         self.html = div(cls="modal-content", contents=[
             div(cls=f"modal-header {cls}", contents=[
                 h.h5(
@@ -106,10 +115,19 @@ class SubmissionCard(UIElement):
                 h.strong("Language: <span class='language-format'>{}</span>".format(submission.language)),
                 h.br(),
                 h.strong("Result: ",
-                    h.select(cls=f"result-choice {submission.id}", onchange=f"changeSubmissionResult('{submission.id}')", contents=[
+                    h.select(cls=f"result-choice {submission.id}", contents=[
                         *resultOptions(submission.result)
                     ])
                 ),
+                h.strong("&emsp;Status: ",
+                         h.select(cls=f"status-choice {submission.id}", contents=[
+                             *statusOptions(submission.status)
+                         ])
+                         ),
+                h.span("&emsp;"),
+                h.button("Save", type="button",
+                         onclick=f"changeSubmissionResult('{submission.id}')",
+                         cls="btn btn-primary"),
                 h.br(),
                 h.br(),
                 h.button("Rejudge", type="button", onclick=f"rejudge('{submission.id}')", cls="btn btn-primary rejudge"),
@@ -141,6 +159,7 @@ class SubmissionRow(UIElement):
                 h.i("&nbsp;", cls=f"fa fa-{icons[sub.result]}"),
                 h.span(verdict_name[sub.result])
             ),
+            h.td(sub.status),
             onclick=f"submissionPopup('{sub.id}')"
         )
 
@@ -154,7 +173,8 @@ class SubmissionTable(UIElement):
                     h.th("Problem"),
                     h.th("Time"),
                     h.th("Language"),
-                    h.th("Result")
+                    h.th("Result"),
+                    h.th("Status"),
                 )
             ),
             h.tbody(
@@ -172,8 +192,8 @@ def judge(params, user):
         )
     
     return Page(
-        h2("Judge Submissions", cls="page-title"),
-        div(id="judge-table", contents=[
+        h2("Judge Submissions", cls="page-title judge-width"),
+        div(id="judge-table", cls="judge-width", contents=[
             SubmissionTable(cont)
         ]),
         div(cls="modal", tabindex="-1", role="dialog", contents=[
